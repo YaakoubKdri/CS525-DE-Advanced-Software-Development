@@ -1,6 +1,7 @@
 package bank.service;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import bank.dao.AccountDAO;
@@ -13,6 +14,7 @@ import bank.proxy.TimingProxy;
 
 public class AccountService implements IAccountService {
 	private IAccountDAO accountDAO;
+    private AccountAdapter adapter = new AccountAdapter();
 
 	
 	public AccountService(){
@@ -48,13 +50,18 @@ public class AccountService implements IAccountService {
 		accountDAO.updateAccount(account);
 	}
 
-	public Account getAccount(long accountNumber) {
+	public AccountDTO getAccount(long accountNumber) {
 		Account account = accountDAO.loadAccount(accountNumber);
-		return account;
+		return adapter.getAccountDTO(account);
 	}
 
-	public Collection<Account> getAllAccounts() {
-		return accountDAO.getAccounts();
+	public Collection<AccountDTO> getAllAccounts() {
+        Collection<Account> accounts = accountDAO.getAccounts();
+        Collection<AccountDTO> dtos = new ArrayList<>();
+        for(Account account : accounts){
+            dtos.add(adapter.getAccountDTO(account));
+        }
+		return dtos;
 	}
 
 	public void withdraw(long accountNumber, double amount) {

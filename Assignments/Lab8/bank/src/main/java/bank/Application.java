@@ -3,14 +3,8 @@ package bank;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 
-import bank.dao.IAccountDAO;
-import bank.domain.Account;
-import bank.domain.AccountEntry;
-import bank.domain.Customer;
 import bank.proxy.TimingProxy;
-import bank.service.AccountService;
-import bank.service.IAccountService;
-
+import bank.service.*;
 
 
 public class Application {
@@ -35,16 +29,16 @@ public class Application {
 		accountService.transferFunds(4253892, 1263862, 100, "payment of invoice 10232");
 		// show balances
 		
-		Collection<Account> accountlist = accountService.getAllAccounts();
-		Customer customer = null;
-		for (Account account : accountlist) {
-			customer = account.getCustomer();
-			System.out.println("Statement for Account: " + account.getAccountnumber());
-			System.out.println("Account Holder: " + customer.getName());
+		Collection<AccountDTO> accountlist = accountService.getAllAccounts();
+
+		for (AccountDTO account : accountlist) {
+			CustomerDTO customerDTO = account.getCustomer();
+			System.out.println("Statement for Account: " + account.getAccountNumber());
+			System.out.println("Account Holder: " + customerDTO.getName());
 			System.out.println("-Date-------------------------"
 							+ "-Description------------------"
 							+ "-Amount-------------");
-			for (AccountEntry entry : account.getEntryList()) {
+			for (AccountEntryDTO entry : account.getEntries()) {
 				System.out.printf("%30s%30s%20.2f\n", entry.getDate()
 						.toString(), entry.getDescription(), entry.getAmount());
 			}
