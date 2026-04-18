@@ -13,6 +13,6 @@ public class ProductionFactory implements AbstractFactory{
 
     @Override
     public IEmailSender createEmailSender() {
-        return new EmailSender();
+        return EmailSender.getInstance();
     }
 }
