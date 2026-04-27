@@ -1,6 +1,7 @@
 package application;
 
 import framework.Before;
+import framework.Inject;
 import framework.Test;
 import framework.TestClass;
 
@@ -25,17 +26,19 @@ public class MyTest {
 		System.out.println("perform test method 2");
 	}
     */
+    @Inject
     Calculator calculator;
 
     @Before
     public void init(){
-        calculator = new CalculatorImpl();
+        calculator.reset();
     }
 
     @Test
     public void testMethod1() {
         assertEquals(calculator.add(3), 3);
-        assertEquals(calculator.add(6), 9);
+        //assertEquals(calculator.add(6), 9);
+        assertEquals(calculator.add(4),7);
     }
 
     @Test

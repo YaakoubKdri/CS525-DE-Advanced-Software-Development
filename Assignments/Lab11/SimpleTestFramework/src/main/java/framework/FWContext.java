@@ -1,5 +1,6 @@
 package framework;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,8 +17,13 @@ public class FWContext {
 
 	public FWContext() {
 		try {
+            Reflections reflections = new Reflections("");
+
+            Set<Class<?>> serviceTypes = reflections.getTypesAnnotatedWith(Service.class);
+            for(Class<?> implementationClass : serviceTypes){
+                objectMap.add(implementationClass.newInstance());
+            }
 			// find and instantiate all classes annotated with the @TestClass annotation
-			Reflections reflections = new Reflections("");
 			Set<Class<?>> types = reflections.getTypesAnnotatedWith(TestClass.class);
 			for (Class<?> implementationClass : types) {
 				objectMap.add((Object) implementationClass.newInstance());
@@ -25,9 +31,39 @@ public class FWContext {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+        performDI();
 	}
 
-	public void start() {
+    private void performDI() {
+        try{
+            for (Object obj : objectMap){
+                for(Field field : obj.getClass().getDeclaredFields()){
+                    if(field.isAnnotationPresent(Inject.class)){
+                        Class<?> fieldType = field.getType();
+                        Object dependency = getBeanOfType(fieldType);
+                        field.setAccessible(true);
+                        field.set(obj, dependency);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Object getBeanOfType(Class<?> interfaceType) {
+        for(Object obj : objectMap){
+            Class<?>[] interfaces = obj.getClass().getInterfaces();
+            for(Class<?> i : interfaces){
+                if(i.equals(interfaceType)){
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void start() {
 		try {
 			for (Object theTestClass : objectMap) {
                 Method beforeMethod = null;

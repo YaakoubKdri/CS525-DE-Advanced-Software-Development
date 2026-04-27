@@ -1,5 +1,8 @@
 package application;
 
+import framework.Service;
+
+@Service
 public class CalculatorImpl implements Calculator{
     private int calcValue = 0;
 
